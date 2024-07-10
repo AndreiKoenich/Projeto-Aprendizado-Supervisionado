@@ -41,25 +41,25 @@ def normalizar_dados(dados_encoded):
 
 def cria_instancia_teste():
     dados_exemplo = {
-        'Temperature': [0.261194],
-        'Humidity': [0.606742],
-        'Wind Speed': [0.298969],
-        'Precipitation (%)': [0.651376],
-        'Atmospheric Pressure': [0.508732],
-        'UV Index': [0.071429],
-        'Visibility (km)': [0.05],
-        'Cloud Cover_clear': [0.0],
+        'Temperature': [0.410448],
+        'Humidity': [0.494382],
+        'Wind Speed': [0.144330],
+        'Precipitation (%)': [0.146789],
+        'Atmospheric Pressure': [0.547746],
+        'UV Index': [0.357143],
+        'Visibility (km)': [0.275],
+        'Cloud Cover_clear': [1.0],
         'Cloud Cover_cloudy': [0.0],
-        'Cloud Cover_overcast': [1.0],
+        'Cloud Cover_overcast': [0.0],
         'Cloud Cover_partly cloudy': [0.0],
         'Season_Autumn': [0.0],
-        'Season_Spring': [0.0],
-        'Season_Summer': [1.0],
+        'Season_Spring': [1.0],
+        'Season_Summer': [0.0],
         'Season_Winter': [0.0],
         'Location_coastal': [0.0],
         'Location_inland': [0.0],
         'Location_mountain': [1.0],
-        'Weather Type': ['Snowy']
+        'Weather Type': ['None']
     }
     instancia_teste = pandas.DataFrame(dados_exemplo)
     return instancia_teste
@@ -88,7 +88,7 @@ def main():
 
     #print(dados)
     #print(dados_encoded)
-    #print(dados_normalizados)
+    print(dados_normalizados)
 
     instancia_teste = cria_instancia_teste()
 
