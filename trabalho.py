@@ -1,6 +1,8 @@
 import csv
 import pandas
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report
 
 def ler_dados_csv(nome_arquivo):
     dados = []
@@ -12,7 +14,7 @@ def ler_dados_csv(nome_arquivo):
 
 def one_hot_encoding(dados):
     df = pandas.DataFrame(dados)
-    df_encoded = pandas.get_dummies(df, columns=['Cloud Cover', 'Season', 'Location', 'Weather Type'])
+    df_encoded = pandas.get_dummies(df, columns=['Cloud Cover', 'Season', 'Location'])
 
     for column in df_encoded.columns:
         if df_encoded[column].dtype == bool:
@@ -21,9 +23,31 @@ def one_hot_encoding(dados):
     return df_encoded
 
 def normalizar_dados(dados_encoded):
+    # Extraindo o atributo alvo 'Weather Type'
+    weather_type = dados_encoded['Weather Type']
+    dados_para_normalizar = dados_encoded.drop(columns=['Weather Type'])
+    
+    # Aplicando a normalização nos dados, exceto 'Weather Type'
     scaler = MinMaxScaler()
-    dados_normalizados = scaler.fit_transform(dados_encoded.astype(float))
-    return pandas.DataFrame(dados_normalizados, columns=dados_encoded.columns)
+    dados_normalizados = scaler.fit_transform(dados_para_normalizar.astype(float))
+    
+    # Recriando o DataFrame com os dados normalizados
+    colunas_normalizadas = dados_para_normalizar.columns
+    dados_normalizados_df = pandas.DataFrame(dados_normalizados, columns=colunas_normalizadas)
+    
+    # Adicionando de volta o atributo 'Weather Type'
+    dados_normalizados_df['Weather Type'] = weather_type.reset_index(drop=True)
+    
+    return dados_normalizados_df
+
+def aplicar_knn(k, dados_normalizados, instancia_teste):
+
+    atributo_alvo = dados_normalizados['Weather Type']
+
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(dados_normalizados, atributo_alvo)
+    resultado = knn.predict(instancia_teste)
+    return resultado
 
 def main():
     nome_arquivo = 'weather_classification_data.csv'
