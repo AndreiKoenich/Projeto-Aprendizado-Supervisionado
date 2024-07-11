@@ -76,26 +76,27 @@ def combinar_naive_bayes(dados, instancia_teste):
 
 def cria_instancia_teste():
     dados_exemplo = {
-        'Temperature': [0.410448],
-        'Humidity': [0.494382],
-        'Wind Speed': [0.144330],
-        'Precipitation (%)': [0.146789],
-        'Atmospheric Pressure': [0.547746],
-        'UV Index': [0.357143],
-        'Visibility (km)': [0.275],
-        'Cloud Cover_clear': [1.0],
+        'Temperature': [0.4104477611940298],
+        'Humidity': [0.6404494382022472],
+        'Wind Speed': [0.1134020618556701],
+        'Precipitation (%)': [0.25688073394495414],
+        'Atmospheric Pressure': [0.5326367486030721],
+        'UV Index': [0.21428571428571427],
+        'Visibility (km)': [0.45],
+        'Cloud Cover_clear': [0.0],
         'Cloud Cover_cloudy': [0.0],
-        'Cloud Cover_overcast': [0.0],
+        'Cloud Cover_overcast': [1.0],
         'Cloud Cover_partly cloudy': [0.0],
-        'Season_Autumn': [0.0],
-        'Season_Spring': [1.0],
+        'Season_Autumn': [1.0],
+        'Season_Spring': [0.0],
         'Season_Summer': [0.0],
         'Season_Winter': [0.0],
         'Location_coastal': [0.0],
-        'Location_inland': [0.0],
-        'Location_mountain': [1.0],
+        'Location_inland': [1.0],
+        'Location_mountain': [0.0],
         'Weather Type': ['None']
     }
+    
     instancia_teste = pandas.DataFrame(dados_exemplo)
     return instancia_teste
 
