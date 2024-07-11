@@ -88,7 +88,7 @@ def main():
 
     #print(dados)
     #print(dados_encoded)
-    print(dados_normalizados)
+    #print(dados_normalizados)
 
     instancia_teste = cria_instancia_teste()
 
