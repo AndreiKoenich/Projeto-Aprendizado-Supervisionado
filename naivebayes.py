@@ -1,46 +1,6 @@
-import csv
-import pandas
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
-from sklearn.metrics import classification_report
 import numpy as np
-
-def ler_dados_csv(nome_arquivo):
-    dados = []
-    with open(nome_arquivo, mode='r', encoding='utf-8') as arquivo_csv:
-        leitor_csv = csv.DictReader(arquivo_csv)
-        for linha in leitor_csv:
-            dados.append(linha)
-    return dados
-
-def one_hot_encoding(dados):
-    df = pandas.DataFrame(dados)
-    df_encoded = pandas.get_dummies(df, columns=['Cloud Cover','Season','Location'])
-
-    for column in df_encoded.columns:
-        if df_encoded[column].dtype == bool:
-            df_encoded[column] = df_encoded[column].astype(int)
-
-    return df_encoded
-
-def normalizar_dados(dados_encoded):
-    # Extraindo o atributo alvo 'Weather Type'
-    weather_type = dados_encoded['Weather Type']
-    dados_para_normalizar = dados_encoded.drop(columns=['Weather Type'])
-    
-    # Aplicando a normalização nos dados, exceto 'Weather Type'
-    scaler = MinMaxScaler()
-    dados_normalizados = scaler.fit_transform(dados_para_normalizar.astype(float))
-    
-    # Recriando o DataFrame com os dados normalizados
-    colunas_normalizadas = dados_para_normalizar.columns
-    dados_normalizados_df = pandas.DataFrame(dados_normalizados, columns=colunas_normalizadas)
-    
-    # Adicionando de volta o atributo 'Weather Type'
-    dados_normalizados_df['Weather Type'] = weather_type.reset_index(drop=True)
-    
-    return dados_normalizados_df
+from utils import cria_instancia_teste, ler_dados_csv, normalizar_dados, one_hot_encoding
 
 def combinar_naive_bayes(dados, instancia_teste):
     # Separar atributos numéricos e categóricos
@@ -73,32 +33,6 @@ def combinar_naive_bayes(dados, instancia_teste):
     resultado = classes[np.argmax(prob_combinada)]
     
     return resultado
-
-def cria_instancia_teste():
-    dados_exemplo = {
-        'Temperature': [0.4104477611940298],
-        'Humidity': [0.6404494382022472],
-        'Wind Speed': [0.1134020618556701],
-        'Precipitation (%)': [0.25688073394495414],
-        'Atmospheric Pressure': [0.5326367486030721],
-        'UV Index': [0.21428571428571427],
-        'Visibility (km)': [0.45],
-        'Cloud Cover_clear': [0.0],
-        'Cloud Cover_cloudy': [0.0],
-        'Cloud Cover_overcast': [1.0],
-        'Cloud Cover_partly cloudy': [0.0],
-        'Season_Autumn': [1.0],
-        'Season_Spring': [0.0],
-        'Season_Summer': [0.0],
-        'Season_Winter': [0.0],
-        'Location_coastal': [0.0],
-        'Location_inland': [1.0],
-        'Location_mountain': [0.0],
-        'Weather Type': ['None']
-    }
-    
-    instancia_teste = pandas.DataFrame(dados_exemplo)
-    return instancia_teste
 
 def main():
     nome_arquivo = 'weather_classification_data.csv'
