@@ -1,5 +1,6 @@
 from sklearn.neighbors import KNeighborsClassifier
 from utils import cria_instancia_teste, ler_dados_csv, normalizar_dados, one_hot_encoding
+import numpy as np
 
 
 def aplicar_knn(k, dados_normalizados, instancia_teste, metrica):
