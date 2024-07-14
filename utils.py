@@ -62,3 +62,10 @@ def cria_instancia_teste():
     }
     instancia_teste = pd.DataFrame(dados_exemplo)
     return instancia_teste
+
+def cross_validation(n, k):
+    prev_i = 0
+    for i in range(1, k):
+        yield (prev_i, i*(n // k))
+        prev_i = i*(n // k)
+    yield (prev_i, n)
