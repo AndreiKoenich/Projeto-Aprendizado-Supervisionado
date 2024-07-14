@@ -16,7 +16,7 @@ def aplicar_knn(k, dados_normalizados, instancia_teste, metrica):
     resultado = knn.predict(instancia_teste.drop(columns=['Weather Type']))
     
     # Retorna o valor do atributo alvo para a instância de teste
-    return resultado[0]  
+    return resultado 
 
 def main():
     nome_arquivo = 'weather_classification_data.csv'
@@ -28,22 +28,46 @@ def main():
     #print(dados_encoded)
     #print(dados_normalizados)
 
-    instancia_teste = cria_instancia_teste()
+    # Shuffle data
+    dados_normalizados = dados_normalizados.sample(frac=1).reset_index(drop=True)
 
-    print('\n### RESULTADOS COM DISTANCIA EUCLIDIANA ###\n')
-    for k in range(1, 101, 2):
-        resultado = aplicar_knn(k, dados_normalizados, instancia_teste, 'euclidean')
-        print(resultado,"\tk = ", k)
+    # Split into test data (15%) and model data (85%)
+    test_size = int(0.15 * len(dados_normalizados))
+    test_data = dados_normalizados[0:test_size]
+    model_data = dados_normalizados[test_size:]
 
-    print('\n### RESULTADOS COM DISTANCIA DE CHEBYSHEV ###\n')
-    for k in range(1, 101, 2):
-        resultado = aplicar_knn(k, dados_normalizados, instancia_teste, 'chebyshev')
-        print(resultado,"\tk = ", k)
+    # Compute target column
+    target = test_data['Weather Type']
 
-    print('\n### RESULTADOS COM DISTANCIA MANHATTAN ###\n')
-    for k in range(1, 101, 2):
-        resultado = aplicar_knn(k, dados_normalizados, instancia_teste, 'manhattan')
-        print(resultado,"\tk = ", k)
+    print('\n### RESULTADOS COM DISTANCIA EUCLIDIANA ###')
+    results = []
+    for k in range(1, 51, 2):
+        prediction = aplicar_knn(k, model_data, test_data, 'euclidean')
+        accuracy = float((prediction == target).sum()) / float(len(prediction))
+        # print(accuracy,"\tk = ", k, sep="")
+        results.append((accuracy, k))
+    best_result = max(results, key=lambda x: x[0])
+    print("Melhor resultado com k=", best_result[1], ", com acuracia de: ", 100*best_result[0], "%", sep="")
+
+    print('\n### RESULTADOS COM DISTANCIA DE CHEBYSHEV ###')
+    results = []
+    for k in range(1, 51, 2):
+        prediction = aplicar_knn(k, model_data, test_data, 'chebyshev')
+        accuracy = float((prediction == target).sum()) / float(len(prediction))
+        # print(accuracy,"\tk = ", k, sep="")
+        results.append((accuracy, k))
+    best_result = max(results, key=lambda x: x[0])
+    print("Melhor resultado com k=", best_result[1], ", com acuracia de: ", 100*best_result[0], "%", sep="")
+
+    print('\n### RESULTADOS COM DISTANCIA MANHATTAN ###')
+    for k in range(1, 51, 2):
+        prediction = aplicar_knn(k, model_data, test_data, 'manhattan')
+        accuracy = float((prediction == target).sum()) / float(len(prediction))
+        # print(accuracy,"\tk = ", k, sep="")
+        results.append((accuracy, k))
+    best_result = max(results, key=lambda x: x[0])
+    print("Melhor resultado com k=", best_result[1], ", com acuracia de: ", 100*best_result[0], "%", sep="")
 
 
 main()
+
