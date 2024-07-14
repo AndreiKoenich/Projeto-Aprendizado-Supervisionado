@@ -1,6 +1,8 @@
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 import numpy as np
 from utils import cria_instancia_teste, ler_dados_csv, normalizar_dados, one_hot_encoding
+import pandas as pd
+
 
 def combinar_naive_bayes(dados, instancia_teste):
     # Separar atributos numéricos e categóricos
@@ -27,12 +29,26 @@ def combinar_naive_bayes(dados, instancia_teste):
     prob_numerico = modelo_gaussiano.predict_proba(instancia_numerico)
     prob_categorico = modelo_multinomial.predict_proba(instancia_categorico)
 
-    # Multiplicar as probabilidades
-    prob_combinada = prob_numerico * prob_categorico
+    # Computa as classes
     classes = modelo_gaussiano.classes_
-    resultado = classes[np.argmax(prob_combinada)]
-    
-    return resultado
+
+    # Inicializa os contadores para calcular a acuracia
+    correct = 0
+    total = 0
+
+    for row_index in range(len(instancia_teste)):
+        # Estimar a classe
+        probabilidade_combinada = prob_numerico[row_index, :] * prob_categorico[row_index, :]
+        classe = classes[np.argmax(probabilidade_combinada)]
+
+        # Checar se a estimativa foi correta
+        if classe == list(instancia_teste['Weather Type'])[row_index]:
+            correct += 1
+        total += 1
+
+    # Calcular a acuracia
+    return float(correct) / float(total)
+
 
 def main():
     nome_arquivo = 'weather_classification_data.csv'
@@ -40,13 +56,16 @@ def main():
     dados_encoded = one_hot_encoding(dados)
     dados_normalizados = normalizar_dados(dados_encoded)
 
-    #print(dados)
-    #print(dados_encoded)
-    #print(dados_normalizados)
+    k = 5 # For k-fold cross-validation
+    for left, right in cross_validation(len(dados_normalizados), k):
+        # Embaralhar os dados e dividir em fracoes de teste e treinamento
+        dados_normalizados = dados_normalizados.sample(frac=1).reset_index(drop=True)
+        training_data = pd.concat((dados_normalizados[0:left], dados_normalizados[right:]))
+        test_data = dados_normalizados[left:right]
 
-    instancia_teste = cria_instancia_teste()
-    resultado = combinar_naive_bayes(dados_normalizados, instancia_teste)
+        # Treinar o modelo
+        results = combinar_naive_bayes(training_data, test_data)
+        print(results)
 
-    print(resultado)
 
 main()
