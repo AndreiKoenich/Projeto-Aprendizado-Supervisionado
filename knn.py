@@ -1,74 +1,65 @@
 from sklearn.neighbors import KNeighborsClassifier
-from utils import cria_instancia_teste, ler_dados_csv, normalizar_dados, one_hot_encoding
-import numpy as np
+import utils
 
 
-def aplicar_knn(k, dados_normalizados, instancia_teste, metrica):
-    # Separar atributo alvo
-    atributo_alvo = dados_normalizados['Weather Type']
-    
-    # Criar modelo kNN
-    knn = KNeighborsClassifier(n_neighbors=k, metric=metrica)
-    
-    # Treinar o modelo com os dados normalizados
-    knn.fit(dados_normalizados.drop(columns=['Weather Type']), atributo_alvo)
-    
-    # Realizar previsão para a instância de teste
-    resultado = knn.predict(instancia_teste.drop(columns=['Weather Type']))
-    
-    # Retorna o valor do atributo alvo para a instância de teste
-    return resultado 
+def _train_knn(train_x, train_y, test_x, test_y, *, metric, min_k=1, max_k=11, k_step=1):
+    for k in range(min_k, max_k, k_step):
+        model = KNeighborsClassifier(n_neighbors=k, metric=metric)
+        model.fit(train_x, train_y)
+        accuracy = model.score(test_x, test_y)
+        yield (model, accuracy)
+
+
+# Uncomment decorators to activate extra functionality
+# @utils.log_usage
+def train_knn_euc(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=1):
+    model_generator = _train_knn(
+            train_x, train_y, test_x, test_y,
+            min_k=min_k, max_k=max_k, k_step=k_step,
+            metric="euclidean")
+    (best_model, best_accuracy) = max(model_generator, key=lambda x: x[1])
+    return (best_model, best_accuracy)
+
+
+# Uncomment decorators to activate extra functionality
+# @utils.log_usage
+def train_knn_che(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=1):
+    model_generator = _train_knn(
+            train_x, train_y, test_x, test_y,
+            min_k=min_k, max_k=max_k, k_step=k_step,
+            metric="chebyshev")
+    (best_model, best_accuracy) = max(model_generator, key=lambda x: x[1])
+    return (best_model, best_accuracy)
+
+
+# Uncomment decorators to activate extra functionality
+# @utils.log_usage
+def train_knn_man(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=1):
+    model_generator = _train_knn(
+            train_x, train_y, test_x, test_y,
+            min_k=min_k, max_k=max_k, k_step=k_step,
+            metric="manhattan")
+    (best_model, best_accuracy) = max(model_generator, key=lambda x: x[1])
+    return (best_model, best_accuracy)
+
 
 def main():
-    nome_arquivo = 'weather_classification_data.csv'
-    dados = ler_dados_csv(nome_arquivo)
-    dados_encoded = one_hot_encoding(dados)
-    dados_normalizados = normalizar_dados(dados_encoded)
+    data = utils.import_data()
+    data = utils.scramble_data(data)
 
-    #print(dados)
-    #print(dados_encoded)
-    #print(dados_normalizados)
+    train_data, test_data = utils.train_test_split(data)
+    train_x, train_y = utils.xy_split(train_data, columns=['Weather Type'])
+    test_x, test_y = utils.xy_split(test_data, columns=['Weather Type'])
 
-    # Shuffle data
-    dados_normalizados = dados_normalizados.sample(frac=1).reset_index(drop=True)
-
-    # Split into test data (15%) and model data (85%)
-    test_size = int(0.15 * len(dados_normalizados))
-    test_data = dados_normalizados[0:test_size]
-    model_data = dados_normalizados[test_size:]
-
-    # Compute target column
-    target = test_data['Weather Type']
-
-    print('\n### RESULTADOS COM DISTANCIA EUCLIDIANA ###')
-    results = []
-    for k in range(1, 51, 2):
-        prediction = aplicar_knn(k, model_data, test_data, 'euclidean')
-        accuracy = float((prediction == target).sum()) / float(len(prediction))
-        # print(accuracy,"\tk = ", k, sep="")
-        results.append((accuracy, k))
-    best_result = max(results, key=lambda x: x[0])
-    print("Melhor resultado com k=", best_result[1], ", com acuracia de: ", 100*best_result[0], "%", sep="")
-
-    print('\n### RESULTADOS COM DISTANCIA DE CHEBYSHEV ###')
-    results = []
-    for k in range(1, 51, 2):
-        prediction = aplicar_knn(k, model_data, test_data, 'chebyshev')
-        accuracy = float((prediction == target).sum()) / float(len(prediction))
-        # print(accuracy,"\tk = ", k, sep="")
-        results.append((accuracy, k))
-    best_result = max(results, key=lambda x: x[0])
-    print("Melhor resultado com k=", best_result[1], ", com acuracia de: ", 100*best_result[0], "%", sep="")
-
-    print('\n### RESULTADOS COM DISTANCIA MANHATTAN ###')
-    for k in range(1, 51, 2):
-        prediction = aplicar_knn(k, model_data, test_data, 'manhattan')
-        accuracy = float((prediction == target).sum()) / float(len(prediction))
-        # print(accuracy,"\tk = ", k, sep="")
-        results.append((accuracy, k))
-    best_result = max(results, key=lambda x: x[0])
-    print("Melhor resultado com k=", best_result[1], ", com acuracia de: ", 100*best_result[0], "%", sep="")
+    (model, accuracy) = train_knn_euc(train_x, train_y, test_x, test_y)
+    print(f"Model accuracy [knn euclidean, k={model.n_neighbors}] = {accuracy}")
+    (model, accuracy) = train_knn_che(train_x, train_y, test_x, test_y)
+    print(f"Model accuracy [knn chebyshev, k={model.n_neighbors}] = {accuracy}")
+    (model, accuracy) = train_knn_man(train_x, train_y, test_x, test_y)
+    print(f"Model accuracy [knn manhattan, k={model.n_neighbors}] = {accuracy}")
 
 
-main()
+if __name__ == '__main__':
+    main()
+
 
