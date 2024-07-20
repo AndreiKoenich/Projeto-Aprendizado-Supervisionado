@@ -5,7 +5,7 @@ from sklearn import tree as tree
 
 def _print_tree(func):
     def x(train_data_x, train_data_y):
-        model = func(train_data_x, train_data_y)
+        (model, accuracy) = func(train_data_x, train_data_y)
         plt.figure(figsize=(20,10))
         tree.plot_tree(
                 model,
@@ -13,7 +13,7 @@ def _print_tree(func):
                 feature_names=train_data_x.columns,
                 class_names=model.classes_)
         plt.show()
-        return model
+        return (model, accuracy)
     x.__name__ = func.__name__
     return x
 
