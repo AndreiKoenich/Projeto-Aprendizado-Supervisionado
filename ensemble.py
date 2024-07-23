@@ -7,7 +7,7 @@ from sklearn.naive_bayes import GaussianNB, MultinomialNB
 import utils
 from decision_tree import train_decision_tree
 from knn import train_knn_euc, train_knn_che, train_knn_man
-from naive_bayes import train_naive_bayes_numerical, train_naive_bayes_categorical
+from naive_bayes import train_naive_bayes_combined
 
 
 # ORCHESTRATION
@@ -17,8 +17,7 @@ def build_models(train_x, train_y, test_x, test_y):
         { 'label': 'knn_euc',               'training_function': train_knn_euc,                 'input_function': utils.identity            },
         { 'label': 'knn_che',               'training_function': train_knn_che,                 'input_function': utils.identity            },
         { 'label': 'knn_man',               'training_function': train_knn_man,                 'input_function': utils.identity            },
-        { 'label': 'naive_bayes_numerical', 'training_function': train_naive_bayes_numerical,   'input_function': utils.extract_numerical   },
-        { 'label': 'naive_bayes_categoric', 'training_function': train_naive_bayes_categorical, 'input_function': utils.extract_categorical },
+        { 'label': 'naive_bayes',           'training_function': train_naive_bayes_combined,    'input_function': utils.identity            },
     ]
 
     models = []
