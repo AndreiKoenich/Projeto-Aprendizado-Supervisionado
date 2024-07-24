@@ -17,6 +17,7 @@ def log_usage(func):
 def import_data():
     filename = 'weather_classification_data.csv'
     data = ler_dados_csv(filename)
+    data = remove_outliers(data)
     data = one_hot_encoding(data)
     data = normalizar_dados(data)
     return data
@@ -69,11 +70,7 @@ def importar_dados():
     pass
 
 def ler_dados_csv(nome_arquivo):
-    dados = []
-    with open(nome_arquivo, mode='r', encoding='utf-8') as arquivo_csv:
-        leitor_csv = csv.DictReader(arquivo_csv)
-        for linha in leitor_csv:
-            dados.append(linha)
+    dados = pd.read_csv(nome_arquivo)
     return dados
 
 def one_hot_encoding(dados):
@@ -103,6 +100,28 @@ def normalizar_dados(dados_encoded):
     dados_normalizados_df['Weather Type'] = weather_type.reset_index(drop=True)
 
     return dados_normalizados_df
+
+import pandas as pd
+import numpy as np
+
+def remove_outliers(dados):
+    # Colunas do dataset que serão analisadas
+    columns = ['Temperature', 'Humidity', 'Wind Speed', 'Precipitation (%)', 'Atmospheric Pressure', 'UV Index', 'Visibility (km)']
+
+    for column in columns:
+        # Obtem os dois "quadrantes" que seram considerados para o cálculo
+        Q1 = dados[column].quantile(0.25)
+        Q3 = dados[column].quantile(0.75)
+        IQR = Q3 - Q1
+
+        # Define os limites com base no IQR calculado
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        
+        # Remove as linhas que contém um outlier no atributo.
+        dados = dados[(dados[column] >= lower_bound) & (dados[column] <= upper_bound)]
+
+    return dados
 
 def cross_validation(n, k):
     prev_i = 0
