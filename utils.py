@@ -1,7 +1,6 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
-
 def log_usage(func):
     def x(*args, **kwargs):
         print('Using function', func.__name__)
