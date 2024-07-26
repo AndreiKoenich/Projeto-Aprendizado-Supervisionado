@@ -1,7 +1,5 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-import numpy as np
-
 
 def log_usage(func):
     def x(*args, **kwargs):
