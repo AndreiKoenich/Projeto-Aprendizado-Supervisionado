@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
+
 def log_usage(func):
     def x(*args, **kwargs):
         print('Using function', func.__name__)
@@ -37,6 +38,15 @@ def xy_split(data, *, columns):
     if len(columns) == 1:
         y = y[columns[0]]
     return (x, y)
+
+def _one_hot_encoding(data, *, columns):
+    data = pd.get_dummies(data, columns=columns)
+
+    for column in data.columns:
+        if data[column].dtype == bool:
+            data[column] = data[column].astype(int)
+
+    return data
 
 
 # INPUT FUNCTIONS
@@ -106,14 +116,6 @@ def remove_outliers(dados):
 
     return dados
 
-def cross_validation(n, k):
-    prev_i = 0
-    for i in range(1, k):
-        yield (prev_i, i*(n // k))
-        prev_i = i*(n // k)
-    yield (prev_i, n)
-
-
 def evaluate_model(model, test_data):
     # Split test data
     target = test_data['Weather Type']
@@ -126,4 +128,3 @@ def evaluate_model(model, test_data):
     accuracy = float((prediction == target).sum()) / float(len(prediction))
 
     return accuracy
-
