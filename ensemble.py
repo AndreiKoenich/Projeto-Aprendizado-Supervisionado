@@ -72,9 +72,9 @@ def main():
     models = build_models(train_x, train_y, test_x, test_y)
     
     print('Acuracia do modelo Arvore de Decisao:\n', models[0]['accuracy'])
-    print('Acuracia do modelo kNN com distancia Euclidiana:\n', models[1]['accuracy'])
-    print('Acuracia do modelo kNN com distancia Chebyshev:\n', models[2]['accuracy'])
-    print('Acuracia do modelo kNN com distancia Manhattan:\n', models[3]['accuracy'])
+    print('Acuracia do modelo kNN com distancia Euclidiana:\n', models[1]['accuracy'],' k = ',models[1]['model'].n_neighbors)
+    print('Acuracia do modelo kNN com distancia Chebyshev:\n', models[2]['accuracy'],' k = ',models[2]['model'].n_neighbors)
+    print('Acuracia do modelo kNN com distancia Manhattan:\n', models[3]['accuracy'],' k = ',models[3]['model'].n_neighbors)
     print('Acuracia do modelo Naive Bayes:\n', models[4]['accuracy'])
 
     train_predictions = input_space_to_prediction_space(models, train_x)

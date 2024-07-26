@@ -2,7 +2,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import utils
 
 
-def _train_knn(train_x, train_y, test_x, test_y, *, metric, min_k=1, max_k=11, k_step=1):
+def _train_knn(train_x, train_y, test_x, test_y, *, metric, min_k=1, max_k=11, k_step=2):
     for k in range(min_k, max_k, k_step):
         model = KNeighborsClassifier(n_neighbors=k, metric=metric)
         model.fit(train_x, train_y)
@@ -12,7 +12,7 @@ def _train_knn(train_x, train_y, test_x, test_y, *, metric, min_k=1, max_k=11, k
 
 # Uncomment decorators to activate extra functionality
 # @utils.log_usage
-def train_knn_euc(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=1):
+def train_knn_euc(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=2):
     model_generator = _train_knn(
             train_x, train_y, test_x, test_y,
             min_k=min_k, max_k=max_k, k_step=k_step,
@@ -23,7 +23,7 @@ def train_knn_euc(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step
 
 # Uncomment decorators to activate extra functionality
 # @utils.log_usage
-def train_knn_che(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=1):
+def train_knn_che(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=2):
     model_generator = _train_knn(
             train_x, train_y, test_x, test_y,
             min_k=min_k, max_k=max_k, k_step=k_step,
@@ -34,7 +34,7 @@ def train_knn_che(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step
 
 # Uncomment decorators to activate extra functionality
 # @utils.log_usage
-def train_knn_man(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=1):
+def train_knn_man(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step=2):
     model_generator = _train_knn(
             train_x, train_y, test_x, test_y,
             min_k=min_k, max_k=max_k, k_step=k_step,
