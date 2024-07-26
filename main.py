@@ -50,7 +50,7 @@ def main():
     print('Acuracia do modelo kNN com distancia Euclidiana:\n', models[1]['accuracy'],' k = ',models[1]['model'].n_neighbors)
     print('Acuracia do modelo kNN com distancia Chebyshev:\n', models[2]['accuracy'],' k = ',models[2]['model'].n_neighbors)
     print('Acuracia do modelo kNN com distancia Manhattan:\n', models[3]['accuracy'],' k = ',models[3]['model'].n_neighbors)
-    print('Acuracia do modelo Naive Bayes:\n', models[4]['accuracy'])
+    print('Acuracia do modelo Naive Bayes:\n', models[4]['accuracy'],'\n')
 
 
 if __name__ == '__main__':
