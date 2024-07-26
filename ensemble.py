@@ -1,5 +1,3 @@
-import pprint
-
 import pandas as pd
 import numpy as np
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
@@ -21,15 +19,17 @@ def build_models(train_x, train_y, test_x, test_y):
     ]
 
     models = []
-
+    
+    print('\nIniciando treinamento dos modelos...\n')
     for param in training_parameters:
         label = param['label']
         training_function = param['training_function']
         input_function = param['input_function']
 
-        print(f'Training model \'{label}\'')
+        print(f'Treinando modelo \'{label}\'')
         (model, accuracy) = training_function(input_function(train_x), train_y, input_function(test_x), test_y)
         models.append({ 'label': label, 'model': model, 'accuracy': accuracy, 'input_function': input_function })
+    print('\nTreinamento dos modelos concluido com sucesso.\n')
 
     return models
 
@@ -41,7 +41,7 @@ def input_space_to_prediction_space(models, X):
         model = _model['model']
         input_function = _model['input_function']
 
-        print(f'Prediction with model \'{label}\'')
+        #print(f'Prediction with model \'{label}\'')
         prediction = model.predict(input_function(X))
         predictions.append(prediction)
 
@@ -70,8 +70,12 @@ def main():
     test_x, test_y = utils.xy_split(test_data, columns=['Weather Type'])
 
     models = build_models(train_x, train_y, test_x, test_y)
-
-    pprint.pprint(models)
+    
+    print('Acuracia do modelo Arvore de Decisao:\n', models[0]['accuracy'])
+    print('Acuracia do modelo kNN com distancia Euclidiana:\n', models[1]['accuracy'])
+    print('Acuracia do modelo kNN com distancia Chebyshev:\n', models[2]['accuracy'])
+    print('Acuracia do modelo kNN com distancia Manhattan:\n', models[3]['accuracy'])
+    print('Acuracia do modelo Naive Bayes:\n', models[4]['accuracy'])
 
     train_predictions = input_space_to_prediction_space(models, train_x)
     train_predictions = utils._one_hot_encoding(train_predictions, columns=[model['label'] for model in models])
@@ -79,10 +83,8 @@ def main():
     test_predictions = utils._one_hot_encoding(test_predictions, columns=[model['label'] for model in models])
 
     (model, accuracy) = train_stacking_model(train_predictions, train_y, test_predictions, test_y)
-    print(accuracy)
-
-
+    
+    print('\nAcuracia final do ensemble:\n', accuracy, '\n')
 
 if __name__ == '__main__':
     main()
-
