@@ -33,31 +33,6 @@ def build_models(train_x, train_y, test_x, test_y):
 
     return models
 
-def input_space_to_prediction_space(models, X):
-    predictions = []
-
-    for _model in models:
-        label = _model['label']
-        model = _model['model']
-        input_function = _model['input_function']
-
-        #print(f'Prediction with model \'{label}\'')
-        prediction = model.predict(input_function(X))
-        predictions.append(prediction)
-
-    predictions = np.array(predictions)
-    predictions = predictions.transpose()
-    predictions = pd.DataFrame(predictions)
-    predictions.columns = [model['label'] for model in models]
-    return predictions
-
-
-def train_stacking_model(train_x, train_y, test_x, test_y):
-    model = MultinomialNB()
-    model.fit(train_x, train_y)
-    accuracy = model.score(test_x, test_y)
-    return (model, accuracy)
-
 
 def main():
     # Import and scramble data
@@ -77,14 +52,6 @@ def main():
     print('Acuracia do modelo kNN com distancia Manhattan:\n', models[3]['accuracy'],' k = ',models[3]['model'].n_neighbors)
     print('Acuracia do modelo Naive Bayes:\n', models[4]['accuracy'])
 
-    train_predictions = input_space_to_prediction_space(models, train_x)
-    train_predictions = utils._one_hot_encoding(train_predictions, columns=[model['label'] for model in models])
-    test_predictions = input_space_to_prediction_space(models, test_x)
-    test_predictions = utils._one_hot_encoding(test_predictions, columns=[model['label'] for model in models])
-
-    (model, accuracy) = train_stacking_model(train_predictions, train_y, test_predictions, test_y)
-    
-    print('\nAcuracia final do ensemble:\n', accuracy, '\n')
 
 if __name__ == '__main__':
     main()

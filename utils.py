@@ -1,4 +1,3 @@
-import csv
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
@@ -40,17 +39,6 @@ def xy_split(data, *, columns):
     if len(columns) == 1:
         y = y[columns[0]]
     return (x, y)
-
-def _one_hot_encoding(data, *, columns):
-    data = pd.get_dummies(data, columns=columns)
-
-    for column in data.columns:
-        if data[column].dtype == bool:
-            data[column] = data[column].astype(int)
-
-    return data
-
-
 
 
 # INPUT FUNCTIONS
@@ -101,9 +89,6 @@ def normalizar_dados(dados_encoded):
 
     return dados_normalizados_df
 
-import pandas as pd
-import numpy as np
-
 def remove_outliers(dados):
     # Colunas do dataset que serão analisadas
     columns = ['Temperature', 'Humidity', 'Wind Speed', 'Precipitation (%)', 'Atmospheric Pressure', 'UV Index', 'Visibility (km)']
@@ -129,31 +114,6 @@ def cross_validation(n, k):
         yield (prev_i, i*(n // k))
         prev_i = i*(n // k)
     yield (prev_i, n)
-
-def cria_instancia_teste():
-    dados_exemplo = {
-        'Temperature': [0.410448],
-        'Humidity': [0.494382],
-        'Wind Speed': [0.144330],
-        'Precipitation (%)': [0.146789],
-        'Atmospheric Pressure': [0.547746],
-        'UV Index': [0.357143],
-        'Visibility (km)': [0.275],
-        'Cloud Cover_clear': [1.0],
-        'Cloud Cover_cloudy': [0.0],
-        'Cloud Cover_overcast': [0.0],
-        'Cloud Cover_partly cloudy': [0.0],
-        'Season_Autumn': [0.0],
-        'Season_Spring': [1.0],
-        'Season_Summer': [0.0],
-        'Season_Winter': [0.0],
-        'Location_coastal': [0.0],
-        'Location_inland': [0.0],
-        'Location_mountain': [1.0],
-        'Weather Type': ['None']
-    }
-    instancia_teste = pd.DataFrame(dados_exemplo)
-    return instancia_teste
 
 
 def evaluate_model(model, test_data):
