@@ -43,23 +43,3 @@ def train_knn_man(train_x, train_y, test_x, test_y, *, min_k=1, max_k=11, k_step
     return (best_model, best_accuracy)
 
 
-def main():
-    data = utils.import_data()
-    data = utils.scramble_data(data)
-
-    train_data, test_data = utils.train_test_split(data)
-    train_x, train_y = utils.xy_split(train_data, columns=['Weather Type'])
-    test_x, test_y = utils.xy_split(test_data, columns=['Weather Type'])
-
-    (model, accuracy) = train_knn_euc(train_x, train_y, test_x, test_y)
-    print(f"Model accuracy [knn euclidean, k={model.n_neighbors}] = {accuracy}")
-    (model, accuracy) = train_knn_che(train_x, train_y, test_x, test_y)
-    print(f"Model accuracy [knn chebyshev, k={model.n_neighbors}] = {accuracy}")
-    (model, accuracy) = train_knn_man(train_x, train_y, test_x, test_y)
-    print(f"Model accuracy [knn manhattan, k={model.n_neighbors}] = {accuracy}")
-
-
-if __name__ == '__main__':
-    main()
-
-
