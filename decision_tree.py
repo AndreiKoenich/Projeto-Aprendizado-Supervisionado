@@ -1,8 +1,8 @@
 import utils
-import matplotlib.pyplot as plt
 from sklearn import tree as tree
+#import matplotlib.pyplot as plt
 
-
+'''
 def _print_tree(func):
     def x(train_data_x, train_data_y):
         (model, accuracy) = func(train_data_x, train_data_y)
@@ -16,11 +16,8 @@ def _print_tree(func):
         return (model, accuracy)
     x.__name__ = func.__name__
     return x
+'''
 
-
-# Uncomment decorators to activate extra functionality
-# @utils.log_usage
-# @_print_tree
 def train_decision_tree(train_data_x, train_data_y, test_data_x, test_data_y):
     model = tree.DecisionTreeClassifier()
     model.fit(train_data_x, train_data_y)
@@ -42,4 +39,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
