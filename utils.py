@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 def log_usage(func):
@@ -14,21 +15,52 @@ def log_usage(func):
 def import_data():
     filename = 'weather_classification_data.csv'
     data = ler_dados_csv(filename)
-    data = remove_outliers(data)
+    #data = remove_outliers(data)
     data = one_hot_encoding(data)
     data = normalizar_dados(data)
     return data
 
-
 def scramble_data(data):
     return data.sample(frac=1).reset_index(drop=True)
 
+# Função para dividir o conjunto de dados manualmente
+def split_data_manual(data):
+    n = len(data)
+    train_end = int(0.7 * n)
+    val_end = int(0.85 * n)
 
-def train_test_split(data, *, test_data_percent=0.15):
-    test_data_count = int(test_data_percent * len(data))
-    train_data = data[test_data_count:]
-    test_data = data[:test_data_count]
-    return (train_data, test_data)
+    train_data = data[:train_end]
+    val_data = data[train_end:val_end]
+    test_data = data[val_end:]
+
+    return train_data, val_data, test_data
+
+
+def stratified_split(data):
+
+    # Filtrar instâncias com base no valor do atributo 'Weather Type'
+    conjunto_snowy = data[data['Weather Type'] == 'Snowy']
+    conjunto_rainy = data[data['Weather Type'] == 'Rainy']
+    conjunto_sunny = data[data['Weather Type'] == 'Sunny']
+    conjunto_cloudy = data[data['Weather Type'] == 'Cloudy']
+
+    # Dividindo manualmente cada um dos conjuntos conjunto_snowy, conjunto_rainy, conjunto_sunny e conjunto_cloudy
+    train_conjunto_snowy, val_conjunto_snowy, test_conjunto_snowy = split_data_manual(conjunto_snowy)
+    train_conjunto_rainy, val_conjunto_rainy, test_conjunto_rainy = split_data_manual(conjunto_rainy)
+    train_conjunto_sunny, val_conjunto_sunny, test_conjunto_sunny = split_data_manual(conjunto_sunny)
+    train_conjunto_cloudy, val_conjunto_cloudy, test_conjunto_cloudy = split_data_manual(conjunto_cloudy)
+
+    # Concatenar os conjuntos de treinamento, validação e teste
+    train_data = pd.concat([train_conjunto_snowy, train_conjunto_rainy, train_conjunto_sunny, train_conjunto_cloudy])
+    val_data = pd.concat([val_conjunto_snowy, val_conjunto_rainy, val_conjunto_sunny, val_conjunto_cloudy])
+    test_data = pd.concat([test_conjunto_snowy, test_conjunto_rainy, test_conjunto_sunny, test_conjunto_cloudy])
+
+    # Opcional: Salvar cada conjunto em um arquivo .csv
+    #train_data.to_csv('train_data.csv', index=False)
+    #val_data.to_csv('val_data.csv', index=False)
+    #test_data.to_csv('test_data.csv', index=False)
+
+    return (train_data, val_data, test_data)
 
 
 def xy_split(data, *, columns):
