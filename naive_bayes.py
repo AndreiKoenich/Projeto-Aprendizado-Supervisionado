@@ -38,6 +38,11 @@ class CombinedNB:
     def score(self, test_x, test_y):
         predictions = self.predict(test_x, test_y)
         return float((test_y == predictions).sum()) / float(len(predictions))
+    
+    def predict_proba(self, test_x):
+        prob_numerico = self.numerical_model.predict_proba(test_x)
+        prob_categorico = self.categorial_model.predict_proba(test_x)
+        return prob_numerico * prob_categorico
 
     def fit(self, train_x, train_y):
         self.numerical_model.fit(train_x, train_y)
@@ -48,5 +53,6 @@ def train_naive_bayes_combined(train_x, train_y, test_x, test_y):
     model = CombinedNB()
     model.fit(train_x, train_y)
     accuracy = model.score(test_x, test_y)
+    utils.makeRocCurve(model, 'train_naive_bayes_combined', test_x, test_y,  train_y)
     return model, accuracy
 

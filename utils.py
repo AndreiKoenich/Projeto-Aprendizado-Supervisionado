@@ -1,5 +1,8 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, LabelBinarizer
+from sklearn.metrics import RocCurveDisplay
+import matplotlib.pyplot as plt
+import numpy as np
 
 def log_usage(func):
     def x(*args, **kwargs):
@@ -37,16 +40,6 @@ def xy_split(data, *, columns):
     if len(columns) == 1:
         y = y[columns[0]]
     return (x, y)
-
-def _one_hot_encoding(data, *, columns):
-    data = pd.get_dummies(data, columns=columns)
-
-    for column in data.columns:
-        if data[column].dtype == bool:
-            data[column] = data[column].astype(int)
-
-    return data
-
 
 # INPUT FUNCTIONS
 atributos_numericos = ['Temperature','Humidity','Wind Speed','Precipitation (%)','Atmospheric Pressure','UV Index','Visibility (km)']
@@ -127,3 +120,35 @@ def evaluate_model(model, test_data):
     accuracy = float((prediction == target).sum()) / float(len(prediction))
 
     return accuracy
+
+def makeRocCurve(model, model_name, test_data_x, test_data_y, train_data_y):
+    label_binarizer = LabelBinarizer().fit(train_data_y)
+    y_onehot_test = label_binarizer.transform(test_data_y)
+    y_onehot_test.shape  # (n_samples, n_classes)
+
+    classes = ["Cloudy", "Sunny", "Snowy", "Rainy"]
+    for class_of_interest in label_binarizer.classes_:
+        class_id = np.flatnonzero(label_binarizer.classes_ == class_of_interest)[0]
+        rest = [c for c in classes if c != class_of_interest]
+
+        y_score = model.predict_proba(test_data_x)
+        display = RocCurveDisplay.from_predictions(
+            y_onehot_test[:, class_id],
+            y_score[:, class_id],
+            name=f"{class_of_interest} vs the rest",
+            color="darkorange",
+            plot_chance_level=True,
+        )
+        _ = display.ax_.set(
+            xlabel="False Positive Rate",
+            ylabel="True Positive Rate",
+            title=f"One-vs-Rest ROC curves:\n{class_of_interest} vs ({', '.join(rest)})",
+        )
+
+        display.plot
+        plt.savefig(f'roc/{class_of_interest}-{model_name}.png')
+
+
+def writeFile(filename, data):
+    df = pd.DataFrame(data)
+    df.to_csv(filename, index=False)
