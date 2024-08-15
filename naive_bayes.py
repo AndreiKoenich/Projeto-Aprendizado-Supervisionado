@@ -54,5 +54,6 @@ def train_naive_bayes_combined(train_x, train_y, test_x, test_y):
     model.fit(train_x, train_y)
     accuracy = model.score(test_x, test_y)
     utils.makeRocCurve(model, 'train_naive_bayes_combined', test_x, test_y,  train_y)
+    utils.makePrCurve(model, 'train_naive_bayes_combined', test_x, test_y,  train_y)
     return model, accuracy
 

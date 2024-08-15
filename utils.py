@@ -1,6 +1,7 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler, LabelBinarizer
-from sklearn.metrics import RocCurveDisplay
+from sklearn.preprocessing import MinMaxScaler, LabelBinarizer, label_binarize
+from sklearn.metrics import RocCurveDisplay, PrecisionRecallDisplay, average_precision_score, precision_recall_curve
+from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -180,6 +181,40 @@ def makeRocCurve(model, model_name, test_data_x, test_data_y, train_data_y):
         plt.savefig(f'roc/{class_of_interest}-{model_name}.png')
 
 
-def writeFile(filename, data):
-    df = pd.DataFrame(data)
-    df.to_csv(filename, index=False)
+def makePrCurve(model, model_name, test_data_x, test_data_y, train_data_y):
+    label_binarizer = LabelBinarizer().fit(train_data_y)
+    y_onehot_test = label_binarizer.transform(test_data_y)
+    y_onehot_test.shape  # (n_samples, n_classes)
+    y_score = model.predict_proba(test_data_x)
+    
+    # Binarize the output for multi-class handling
+    classes = ["Cloudy", "Sunny", "Snowy", "Rainy"]
+
+    precision = dict()
+    recall = dict()
+    average_precision = dict()
+    
+    for i in range(len(classes)):
+        precision[i], recall[i], _ = precision_recall_curve(y_onehot_test[:, i], y_score[:, i])
+        average_precision[i] = average_precision_score(y_onehot_test[:, i], y_score[:, i])
+    
+    # A "micro-average": quantifying score on all classes jointly
+    precision["micro"], recall["micro"], _ = precision_recall_curve(
+        y_onehot_test.ravel(), y_score.ravel()
+    )
+    average_precision["micro"] = average_precision_score(y_onehot_test, y_score, average="micro")
+
+    # Here, you would add the code to plot the PR curve if needed
+
+
+
+    display = PrecisionRecallDisplay(
+        recall=recall["micro"],
+        precision=precision["micro"],
+        average_precision=average_precision["micro"],
+        prevalence_pos_label=Counter(test_data_y.ravel())[1] / test_data_y.size,
+    )
+    display.plot(plot_chance_level=True)
+    _ = display.ax_.set_title("Micro-averaged over all classes")
+    plt.savefig(f'pr/{model_name}.png')
+
