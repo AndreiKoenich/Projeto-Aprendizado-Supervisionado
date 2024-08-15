@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
 
 import utils
 from decision_tree import train_decision_tree
@@ -38,8 +37,11 @@ def main():
     # Import and scramble data
     data = utils.import_data()
     data = utils.scramble_data(data)
+
+
     # Split into train and test data
-    train_data, test_data = utils.train_test_split(data)
+    train_data, val_data, test_data = utils.stratified_split(data)
+
     # Split into x and y columns
     train_x, train_y = utils.xy_split(train_data, columns=['Weather Type'])
     test_x, test_y = utils.xy_split(test_data, columns=['Weather Type'])
