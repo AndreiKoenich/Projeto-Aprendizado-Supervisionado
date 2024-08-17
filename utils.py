@@ -1,3 +1,5 @@
+import random
+import os
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, LabelBinarizer, label_binarize
 from sklearn.metrics import RocCurveDisplay, PrecisionRecallDisplay, average_precision_score, precision_recall_curve
@@ -18,13 +20,20 @@ def log_usage(func):
 def import_data():
     filename = 'weather_classification_data.csv'
     data = ler_dados_csv(filename)
-    #data = remove_outliers(data)
+    data = remove_outliers(data)
     data = one_hot_encoding(data)
     data = normalizar_dados(data)
     return data
 
 def scramble_data(data):
     return data.sample(frac=1).reset_index(drop=True)
+
+# Função para dividir o conjunto de dados manualmente
+def split_data(data, proportion=0.85):
+    n = int(proportion*len(data))
+    first_part = data[0:n]
+    second_part = data[n:]
+    return first_part, second_part
 
 # Função para dividir o conjunto de dados manualmente
 def split_data_manual(data):
@@ -38,9 +47,50 @@ def split_data_manual(data):
 
     return train_data, val_data, test_data
 
+def bootstrap_inner(data, test_ratio=0.15):
+    test_count = int(test_ratio*len(data))
+    data = scramble_data(data)
+    test = data[:test_count]
+    train = data[test_count:]
+    train_count = len(train)
+    for _ in range(test_count):
+        i = random.randint(0, train_count)
+        asd = pd.DataFrame([train.iloc[i]])
+        train = pd.concat([train, asd])
+    return train, test
+
+
+def bootstrap(data):
+    # Filtrar instâncias com base no valor do atributo 'Weather Type'
+    conjunto_snowy = data[data['Weather Type'] == 'Snowy']
+    conjunto_rainy = data[data['Weather Type'] == 'Rainy']
+    conjunto_sunny = data[data['Weather Type'] == 'Sunny']
+    conjunto_cloudy = data[data['Weather Type'] == 'Cloudy']
+    
+    train_test_data_snowy, val_data_snowy = split_data(conjunto_snowy, 0.85)
+    train_test_data_rainy, val_data_rainy = split_data(conjunto_rainy, 0.85)
+    train_test_data_sunny, val_data_sunny = split_data(conjunto_sunny, 0.85)
+    train_test_data_cloudy, val_data_cloudy = split_data(conjunto_cloudy, 0.85)
+
+    train_data_snowy, test_data_snowy = bootstrap_inner(train_test_data_snowy)
+    train_data_rainy, test_data_rainy = bootstrap_inner(train_test_data_rainy)
+    train_data_sunny, test_data_sunny = bootstrap_inner(train_test_data_sunny)
+    train_data_cloudy, test_data_cloudy = bootstrap_inner(train_test_data_cloudy)
+
+    # Concatenar os conjuntos de treinamento, validação e teste
+    train_data = pd.concat([train_data_snowy, train_data_rainy, train_data_sunny, train_data_cloudy])
+    val_data = pd.concat([val_data_snowy, val_data_rainy, val_data_sunny, val_data_cloudy])
+    test_data = pd.concat([test_data_snowy, test_data_rainy, test_data_sunny, test_data_cloudy])
+
+    # Opcional: Salvar cada conjunto em um arquivo .csv
+    train_data.to_csv('train_data.csv', index=False)
+    val_data.to_csv('val_data.csv', index=False)
+    test_data.to_csv('test_data.csv', index=False)
+
+    return (train_data, val_data, test_data)
+
 
 def stratified_split(data):
-
     # Filtrar instâncias com base no valor do atributo 'Weather Type'
     conjunto_snowy = data[data['Weather Type'] == 'Snowy']
     conjunto_rainy = data[data['Weather Type'] == 'Rainy']
@@ -59,9 +109,9 @@ def stratified_split(data):
     test_data = pd.concat([test_conjunto_snowy, test_conjunto_rainy, test_conjunto_sunny, test_conjunto_cloudy])
 
     # Opcional: Salvar cada conjunto em um arquivo .csv
-    #train_data.to_csv('train_data.csv', index=False)
-    #val_data.to_csv('val_data.csv', index=False)
-    #test_data.to_csv('test_data.csv', index=False)
+    train_data.to_csv('train_data.csv', index=False)
+    val_data.to_csv('val_data.csv', index=False)
+    test_data.to_csv('test_data.csv', index=False)
 
     return (train_data, val_data, test_data)
 
@@ -153,7 +203,7 @@ def evaluate_model(model, test_data):
 
     return accuracy
 
-def makeRocCurve(model, model_name, test_data_x, test_data_y, train_data_y):
+def makeRocCurve(model, model_name, test_data_x, test_data_y, train_data_y, dir_root):
     label_binarizer = LabelBinarizer().fit(train_data_y)
     y_onehot_test = label_binarizer.transform(test_data_y)
     y_onehot_test.shape  # (n_samples, n_classes)
@@ -177,11 +227,12 @@ def makeRocCurve(model, model_name, test_data_x, test_data_y, train_data_y):
             title=f"One-vs-Rest ROC curves:\n{class_of_interest} vs ({', '.join(rest)})",
         )
 
-        display.plot
-        plt.savefig(f'roc/{class_of_interest}-{model_name}.png')
+        # display.plot()
+        os.makedirs(f'{dir_root}/roc', exist_ok=True)
+        plt.savefig(f'{dir_root}/roc/{class_of_interest}-{model_name}.png')
 
 
-def makePrCurve(model, model_name, test_data_x, test_data_y, train_data_y):
+def makePrCurve(model, model_name, test_data_x, test_data_y, train_data_y, dir_root):
     label_binarizer = LabelBinarizer().fit(train_data_y)
     y_onehot_test = label_binarizer.transform(test_data_y)
     y_onehot_test.shape  # (n_samples, n_classes)
@@ -195,7 +246,9 @@ def makePrCurve(model, model_name, test_data_x, test_data_y, train_data_y):
     average_precision = dict()
     
     for i in range(len(classes)):
-        precision[i], recall[i], _ = precision_recall_curve(y_onehot_test[:, i], y_score[:, i])
+        precision[i], recall[i], _ = precision_recall_curve(
+                y_onehot_test[:, i],
+                y_score[:, i])
         average_precision[i] = average_precision_score(y_onehot_test[:, i], y_score[:, i])
     
     # A "micro-average": quantifying score on all classes jointly
@@ -206,8 +259,6 @@ def makePrCurve(model, model_name, test_data_x, test_data_y, train_data_y):
 
     # Here, you would add the code to plot the PR curve if needed
 
-
-
     display = PrecisionRecallDisplay(
         recall=recall["micro"],
         precision=precision["micro"],
@@ -216,5 +267,6 @@ def makePrCurve(model, model_name, test_data_x, test_data_y, train_data_y):
     )
     display.plot(plot_chance_level=True)
     _ = display.ax_.set_title("Micro-averaged over all classes")
-    plt.savefig(f'pr/{model_name}.png')
+    os.makedirs(f'{dir_root}/pr', exist_ok=True)
+    plt.savefig(f'{dir_root}/pr/{model_name}.png')
 

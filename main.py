@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import pprint
 
 import utils
 from decision_tree import train_decision_tree
@@ -37,7 +38,9 @@ def main():
     # Import and scramble data
     data = utils.import_data()
     data = utils.scramble_data(data)
-
+    # data.to_csv('all_data.csv', index=False)
+    # data = utils.remove_outliers(data)
+    # data.to_csv('all_data.csv', index=False)
 
     # Split into train and test data
     train_data, val_data, test_data = utils.stratified_split(data)
@@ -45,9 +48,17 @@ def main():
     # Split into x and y columns
     train_x, train_y = utils.xy_split(train_data, columns=['Weather Type'])
     test_x, test_y = utils.xy_split(test_data, columns=['Weather Type'])
+    val_x, val_y = utils.xy_split(val_data, columns=['Weather Type'])
 
     models = build_models(train_x, train_y, test_x, test_y)
-    
+
+    for model in models:
+        model_label = model['label']
+        model_obj = model['model']
+        accuracy = model_obj.score(val_x, val_y)
+        print(f'O modelo "{model_label}" possuir acuracia de {accuracy}')
+
+    pprint.pprint(models)
     print('Acuracia do modelo Arvore de Decisao:\n', models[0]['accuracy'])
     print('Acuracia do modelo kNN com distancia Euclidiana:\n', models[1]['accuracy'],' k = ',models[1]['model'].n_neighbors)
     print('Acuracia do modelo kNN com distancia Chebyshev:\n', models[2]['accuracy'],' k = ',models[2]['model'].n_neighbors)
@@ -57,3 +68,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
