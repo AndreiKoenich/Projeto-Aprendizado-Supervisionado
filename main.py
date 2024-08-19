@@ -52,13 +52,16 @@ def main():
 
     models = build_models(train_x, train_y, test_x, test_y)
 
+    print('ACURACIAS OBTIDAS COM OTIMIZACAO DE HIPERPARAMETROS COM O CONJUNTO DE VALIDACAO:\n')
     for model in models:
         model_label = model['label']
         model_obj = model['model']
         accuracy = model_obj.score(val_x, val_y)
-        print(f'O modelo "{model_label}" possuir acuracia de {accuracy}')
+        print(f'Modelo "{model_label}":\n{accuracy}')
 
-    pprint.pprint(models)
+    #pprint.pprint(models)
+
+    print('\nACURACIAS OBTIDAS APOS OTIMIZACAO DE HIPERPARAMETROS COM O CONJUNTO DE TESTE:\n')
     print('Acuracia do modelo Arvore de Decisao:\n', models[0]['accuracy'])
     print('Acuracia do modelo kNN com distancia Euclidiana:\n', models[1]['accuracy'],' k = ',models[1]['model'].n_neighbors)
     print('Acuracia do modelo kNN com distancia Chebyshev:\n', models[2]['accuracy'],' k = ',models[2]['model'].n_neighbors)
@@ -68,4 +71,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
