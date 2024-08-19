@@ -39,7 +39,6 @@ def main():
     data = utils.import_data()
     data = utils.scramble_data(data)
     # data.to_csv('all_data.csv', index=False)
-    # data = utils.remove_outliers(data)
     # data.to_csv('all_data.csv', index=False)
 
     # Split into train and test data
