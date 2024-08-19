@@ -1,12 +1,14 @@
+import pprint
+import shutil
+import os
+
 import pandas as pd
 import numpy as np
-import pprint
 
 import utils
 from decision_tree import train_decision_tree
 from knn import train_knn_euc, train_knn_che, train_knn_man
 from naive_bayes import train_naive_bayes_combined
-import os
 
 
 def build_models(train_x, train_y, test_x, test_y):
@@ -82,8 +84,10 @@ def run_test(data, root_dir, *,
     for model in models:
         model_label = model['label']
         model_obj = model['model']
-        utils.makeRocCurve(model_obj, f'train_{model_label}', test_x, test_y, train_y, root_dir)
-        utils.makePrCurve(model_obj, f'train_{model_label}', test_x, test_y, train_y, root_dir)
+        model_dir = f'{root_dir}/{model_label}'
+        os.makedirs(model_dir, exist_ok=True)
+        utils.makeRocCurve(model_obj, f'train_{model_label}', test_x, test_y, train_y, model_dir)
+        utils.makePrCurve(model_obj, f'train_{model_label}', test_x, test_y, train_y, model_dir)
     
     return models
 
@@ -98,11 +102,12 @@ def main():
     strategies = [ 'holdout', 'bootstrap' ]
 
     test_index = 0
+    shutil.rmtree('tests')
     for remove_outliers in range(2):
         for test_strategy in strategies:
             # Test environment setup
             test_index += 1
-            test_directory = f'test_{test_index}'
+            test_directory = f'tests/test_{test_index}'
             os.makedirs(test_directory, exist_ok=True)
             
             # Write test's description.txt
