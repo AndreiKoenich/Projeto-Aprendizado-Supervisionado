@@ -66,13 +66,22 @@ def run_test(data, root_dir, *,
     models = build_models(train_x, train_y, test_x, test_y)
 
     # Model evaluation
+    with open(f'{root_dir}/test_data.txt', 'a') as file:
+        for model in models:
+            model_label = model['label']
+            model_obj = model['model']
+            accuracy = model_obj.score(val_x, val_y)
+            model['test_accuracy'] = accuracy
+
+            file.write(f'[Test "{model_label}"]\n')
+            file.write(f'accurarcy={accuracy}\n')
+            file.write(f'model={model_obj.__repr__()}\n')
+            file.write(f'\n')
+
+    # ROC e PR
     for model in models:
         model_label = model['label']
         model_obj = model['model']
-        accuracy = model_obj.score(val_x, val_y)
-        model['validation_accuracy'] = accuracy
-
-    for model in models:
         utils.makeRocCurve(model_obj, f'train_{model_label}', test_x, test_y, train_y, root_dir)
         utils.makePrCurve(model_obj, f'train_{model_label}', test_x, test_y, train_y, root_dir)
     
@@ -86,26 +95,30 @@ def main():
 
     result_set = []
 
-    strategies = [
-            'holdout',
-            'bootstrap',
-            ]
+    strategies = [ 'holdout', 'bootstrap' ]
 
     test_index = 0
     for remove_outliers in range(2):
         for test_strategy in strategies:
+            # Test environment setup
             test_index += 1
             test_directory = f'test_{test_index}'
             os.makedirs(test_directory, exist_ok=True)
-            with open(f'{test_directory}/description.txt', 'w') as file:
+            
+            # Write test's description.txt
+            with open(f'{test_directory}/test_data.txt', 'w') as file:
                 file.write(f'[parameters]\n')
                 file.write(f'remove_outliers={bool(remove_outliers)}\n')
                 file.write(f'test_strategy={test_strategy}\n')
+                file.write(f'\n')
 
+            # Run test (store data in test_1)
             models = run_test(data, test_directory,
                               remove_outliers=bool(remove_outliers),
                               train_data_strategy=test_strategy,
                               )
+
+            # Store data in data structure
             result_set.append({
                 'test_index': test_index,
                 'remove_outliers': bool(remove_outliers),
@@ -113,6 +126,7 @@ def main():
                 'models': models,
                 })
 
+    # Pretty print test data
     for test_data in result_set:
         pprint.pprint(test_data)
 
