@@ -26,7 +26,7 @@ def build_models(train_x, train_y, test_x, test_y):
 
     models = []
     
-    print('\nIniciando treinamento dos modelos...\n')
+    print('Iniciando treinamento dos modelos...\n')
     for param in training_parameters:
         label = param['label']
         training_function = param['training_function']
@@ -134,10 +134,6 @@ def main():
                 'test_strategy': test_strategy,
                 'models': models,
                 })
-
-    # Pretty print test data
-    for test_data in result_set:
-        pprint.pprint(test_data)
 
 
 if __name__ == '__main__':
