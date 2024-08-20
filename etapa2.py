@@ -102,7 +102,7 @@ def main():
     strategies = [ 'holdout', 'bootstrap' ]
 
     test_index = 0
-    shutil.rmtree('tests')
+    #shutil.rmtree('tests')
     for remove_outliers in range(2):
         for test_strategy in strategies:
             # Test environment setup
