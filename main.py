@@ -47,12 +47,12 @@ def run_test(data, root_dir, *,
     # Data pre-processing
     if remove_outliers:
         data = utils.remove_outliers(data)
-        data.to_csv('outlier_free_data.csv', index=False)
-    data.to_csv('raw_data.csv', index=False)
+        #data.to_csv('outlier_free_data.csv', index=False)
+    #data.to_csv('raw_data.csv', index=False)
     data = utils.one_hot_encoding(data)
     data = utils.normalizar_dados(data)
     data = utils.scramble_data(data)
-    data.to_csv('clean_data.csv', index=False)
+    #data.to_csv('clean_data.csv', index=False)
 
     # Data splitting
     if train_data_strategy == 'holdout':
