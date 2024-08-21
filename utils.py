@@ -83,9 +83,9 @@ def bootstrap(data):
     test_data = pd.concat([test_data_snowy, test_data_rainy, test_data_sunny, test_data_cloudy])
 
     # Opcional: Salvar cada conjunto em um arquivo .csv
-    train_data.to_csv('train_data.csv', index=False)
-    val_data.to_csv('val_data.csv', index=False)
-    test_data.to_csv('test_data.csv', index=False)
+    #train_data.to_csv('train_data.csv', index=False)
+    #val_data.to_csv('val_data.csv', index=False)
+    #test_data.to_csv('test_data.csv', index=False)
 
     return (train_data, val_data, test_data)
 
