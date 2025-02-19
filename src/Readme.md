@@ -1,5 +1,7 @@
 UNIVERSIDADE FEDERAL DO RIO GRANDE DO SUL - Agosto de 2024
+
 Aprendizado de Máquina
+
 Trabalho 2 - Avaliação de Modelos
 
 ANDREI POCHMANN KOENICH
