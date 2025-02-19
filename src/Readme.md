@@ -3,8 +3,11 @@ Aprendizado de Máquina
 Trabalho 2 - Avaliação de Modelos
 
 ANDREI POCHMANN KOENICH
+
 BRUNO FERREIRA AIRES
+
 FELIPE KAISER SCHNITZLER
+
 FELIPE SOUZA DIDIO
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
