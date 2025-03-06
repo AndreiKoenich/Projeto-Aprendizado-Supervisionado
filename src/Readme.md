@@ -17,10 +17,15 @@ FELIPE SOUZA DIDIO
 DESCRIÇÕES DOS ARQUIVOS:
 
 weather_classification_data.csv 		- Contém os dados a serem lidos e analisados pelos modelos.
+
 naivebayes.py							- Contém as funções referentes à aplicação do algoritmo Naive Bayes.
+
 knn.py 									- Contém as funções referentes à aplicação do algoritmo k-Nearest Neighbors.
+
 decision.tree.py 						- Contém as funções referentes à aplicação do algoritmo de Árvore de Decisão.
+
 utils.py								- Contém funções para leitura dos dados de entrada, pré-processamento dos dados, separação dos dados em treinamento, validação e teste e avaliação dos modelos.
+
 main.py									- Contém as chamadas das funções existentes nos demais arquivos, para obtenção dos valores de acurácia obtidos para cada um dos cinco modelos nos quatro testes descritos no relatório, além das curvas PR e ROC.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
