@@ -37,21 +37,34 @@ Depois disso, serão executados os quatro testes possíveis para cada um dos cin
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-IMPORTAÇÕES UTILIZADAS:
+IMPORTS UTILIZADOS:
 
 import pandas as pd
+
 import numpy as np
+
 from sklearn.preprocessing import MinMaxScaler, LabelBinarizer, label_binarize
+
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
+
 from sklearn.neighbors import KNeighborsClassifier
+
 from sklearn import tree as tree
+
 import warnings
+
 import pprint
+
 import shutil
+
 import os
+
 import random
+
 from sklearn.metrics import RocCurveDisplay, PrecisionRecallDisplay, average_precision_score, precision_recall_curve
+
 from collections import Counter
+
 import matplotlib.pyplot as plt
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
